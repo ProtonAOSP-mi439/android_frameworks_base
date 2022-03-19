@@ -164,11 +164,16 @@ public final class GmsHooks {
 
             if (GmsCompat.isPlayServices()) {
                 GmsDynamiteHooks.initGmsServerApp(app);
-            }
-            if (!Process.isIsolated()) {
-                GmsCompatApp.connect(app);
-            } else {
-                Log.d(TAG, "initApplicationBeforeOnCreate: isolated process " + Application.getProcessName());
+
+                if ("com.google.android.gms.persistent".equals(processName)) {
+                    // BOOT_COMPLETED receiver runs in this process
+                    GmsCompatApp.startPersistentFgService(app);
+                }
+            } else if (GmsCompat.isPlayStore()) {
+                if (GmsInfo.PACKAGE_PLAY_STORE.equals(processName)) {
+                    // BOOT_COMPLETED receiver runs in this process
+                    GmsCompatApp.startPersistentFgService(app);
+                }
             }
         } else if (GmsCompat.isDynamiteClient()) {
             GmsDynamiteHooks.initClientApp();
