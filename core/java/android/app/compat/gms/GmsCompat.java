@@ -80,7 +80,6 @@ public final class GmsCompat {
     // no need to declare these fields as volatile, they are written when app has only the main thread
     private static boolean isGmsCompatEnabled;
     private static boolean isDynamiteClientEnabled;
-    private static boolean isPlayServices;
     private static boolean isPlayStore;
 
     // Static only
@@ -93,11 +92,6 @@ public final class GmsCompat {
     /** @hide */
     public static boolean isDynamiteClient() {
         return isDynamiteClientEnabled;
-    }
-
-    /** @hide */
-    public static boolean isPlayServices() {
-        return isPlayServices;
     }
 
     /** @hide */
@@ -142,9 +136,7 @@ public final class GmsCompat {
         isDynamiteClientEnabled = isChangeEnabled("GMS_UNPRIVILEGED_DYNAMITE_CLIENT", GMS_UNPRIVILEGED_DYNAMITE_CLIENT);
         if (isGmsCompatEnabled) {
             // certificate is already checked if isGmsCompatEnabled is set
-            String pkg = app.getPackageName();
-            isPlayServices = GmsInfo.PACKAGE_GMS.equals(pkg);
-            isPlayStore = GmsInfo.PACKAGE_PLAY_STORE.equals(pkg);
+            isPlayStore = GmsInfo.PACKAGE_PLAY_STORE.equals(app.getPackageName());
         }
     }
 
