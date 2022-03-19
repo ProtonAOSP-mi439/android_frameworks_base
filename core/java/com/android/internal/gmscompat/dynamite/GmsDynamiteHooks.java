@@ -130,29 +130,25 @@ public final class GmsDynamiteHooks {
         if (!GmsCompat.isDynamiteClient()) {
             return null;
         }
-        DynamiteContext dynamiteCtx = getClientContext();
-        final String path = file.getAbsolutePath();
 
-        if (!path.startsWith(dynamiteCtx.gmsDataPrefix)) {
+        ModuleLoadState state = getClientContext().getState();
+        if (state == null || !state.modulePath.equals(file.getPath())) {
             return null;
         }
+
         long lastModified;
         try {
-            lastModified = dynamiteCtx.getService().getLastModified(path);
+            lastModified = getClientContext().getService().getLastModified(file.getPath());
         } catch (RemoteException e) {
             throw e.rethrowAsRuntimeException();
         }
-        Log.d(DynamiteContext.TAG, "File " + path + " lastModified=" + lastModified);
+        Log.d(DynamiteContext.TAG, "File " + file.getPath() + " lastModified=" + lastModified);
 
-        ModuleLoadState state = dynamiteCtx.getState();
-        if (state != null && state.modulePath.equals(path)) {
-            Log.d(DynamiteContext.TAG, "Finished loading module " + state.modulePath);
-            // This is the final hook in the module loading process, so clear the state.
-            dynamiteCtx.setState(null);
-        } else {
-            Log.d(DynamiteContext.TAG, "lastModified check outside the main module loading sequence");
-        }
-        return Long.valueOf(lastModified);
+        // This is the final hook in the module loading process, so clear the state.
+        getClientContext().setState(null);
+
+        Log.d(DynamiteContext.TAG, "Finished loading module " + state.modulePath);
+        return lastModified;
     }
 
     // To start the module loading process and map native library paths to fd from remote
